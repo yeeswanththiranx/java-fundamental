@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Fundamentals – Lecture Slides</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue: #1E40AF;
+    --blue-light: #EFF6FF;
+    --blue-mid: #BFDBFE;
+    --blue-dark: #1E3A8A;
+    --accent: #F59E0B;
+    --accent-light: #FEF3C7;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-400: #9CA3AF;
+    --gray-600: #4B5563;
+    --gray-800: #1F2937;
+    --gray-900: #111827;
+    --green: #065F46;
+    --green-light: #ECFDF5;
+    --red: #991B1B;
+    --red-light: #FEF2F2;
+    --white: #FFFFFF;
+    --slide-w: 960px;
+    --slide-h: 540px;
+    --font: 'Inter', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font);
+    background: #1a1a2e;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 28px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+  }
+  .topbar-title {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  .topbar-sub {
+    color: rgba(255,255,255,0.45);
+    font-size: 13px;
+    margin-left: 12px;
+  }
+  .slide-counter {
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── STAGE ── */
+  .stage {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px 20px;
+    gap: 20px;
+  }
+
+  /* ── SLIDE ── */
+  .slide-wrapper {
+    width: min(var(--slide-w), 100%);
+    aspect-ratio: 16/9;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.07);
+  }
+
+  .slide {
+    width: 100%;
+    height: 100%;
+    background: var(--white);
+    display: none;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  .slide.active { display: flex; }
+
+  /* slide strip accent */
+  .slide::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--blue-dark), var(--blue), #3B82F6);
+  }
+
+  /* ── SLIDE LAYOUTS ── */
+  .slide-cover {
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 60%, #1E40AF 100%);
+    text-align: center;
+  }
+  .slide-cover::before { display: none; }
+
+  .slide-section {
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--blue-light) 0%, #DBEAFE 100%);
+    text-align: center;
+  }
+
+  .slide-content {
+    padding: 36px 48px 32px;
+    gap: 0;
+  }
+
+  .slide-two-col {
+    padding: 36px 48px 32px;
+    flex-direction: column;
+  }
+
+  /* ── COVER ELEMENTS ── */
+  .cover-eyebrow {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .cover-title {
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 14px;
+    max-width: 700px;
+  }
+  .cover-sub {
+    font-size: 17px;
+    color: rgba(255,255,255,0.55);
+    font-weight: 400;
+    margin-bottom: 36px;
+  }
+  .cover-chips {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .chip {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.8);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.03em;
+  }
+
+  /* ── SECTION DIVIDER ── */
+  .section-num {
+    font-size: 72px;
+    font-weight: 700;
+    color: var(--blue-mid);
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+  .section-label {
+    font-size: clamp(20px, 3vw, 30px);
+    font-weight: 700;
+    color: var(--blue-dark);
+    margin-bottom: 8px;
+  }
+  .section-sub {
+    font-size: 15px;
+    color: var(--gray-600);
+  }
+
+  /* ── SLIDE HEADER ── */
+  .slide-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1.5px solid var(--gray-200);
+  }
+  .slide-tag {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--blue);
+    background: var(--blue-light);
+    border: 1px solid var(--blue-mid);
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    margin-top: 3px;
+  }
+  .slide-title {
+    font-size: clamp(18px, 2.5vw, 26px);
+    font-weight: 700;
+    color: var(--gray-900);
+    line-height: 1.2;
+  }
+
+  /* ── BODY TEXT ── */
+  .body-lg {
+    font-size: clamp(14px, 1.6vw, 18px);
+    color: var(--gray-800);
+    line-height: 1.7;
+  }
+  .body-md {
+    font-size: clamp(13px, 1.4vw, 16px);
+    color: var(--gray-700, #374151);
+    line-height: 1.65;
+  }
+
+  /* ── BULLET LIST ── */
+  .blist {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .blist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: clamp(13px, 1.5vw, 16px);
+    color: var(--gray-800);
+    line-height: 1.55;
+  }
+  .blist li::before {
+    content: '';
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--blue);
+    margin-top: 6px;
+  }
+  .blist.green li::before { background: #10B981; }
+  .blist.amber li::before { background: var(--accent); }
+
+  /* ── DEFINITION CARD ── */
+  .def-card {
+    background: var(--blue-light);
+    border: 1px solid var(--blue-mid);
+    border-left: 4px solid var(--blue);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 18px;
+  }
+  .def-q {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--blue);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+  .def-a {
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--gray-900);
+    line-height: 1.6;
+  }
+
+  /* ── CODE BLOCK ── */
+  .code-wrap {
+    background: #0F172A;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 14px 0;
+  }
+  .code-bar {
+    background: #1E293B;
+    padding: 7px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #334155;
+  }
+  .code-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .code-dot.r { background: #EF4444; }
+  .code-dot.y { background: #F59E0B; }
+  .code-dot.g { background: #10B981; }
+  .code-lang {
+    margin-left: auto;
+    font-size: 11px;
+    color: #64748B;
+    font-family: var(--mono);
+  }
+  pre {
+    padding: 14px 18px;
+    font-family: var(--mono);
+    font-size: clamp(11px, 1.2vw, 13px);
+    color: #E2E8F0;
+    line-height: 1.7;
+    overflow-x: auto;
+  }
+  .kw { color: #93C5FD; }
+  .fn { color: #6EE7B7; }
+  .st { color: #FCA5A5; }
+  .cm { color: #475569; font-style: italic; }
+  .ty { color: #FDE68A; }
+
+  /* ── ALERT BOXES ── */
+  .alert {
+    display: flex;
+    gap: 12px;
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: clamp(12px, 1.3vw, 14px);
+    line-height: 1.55;
+    margin-top: 14px;
+  }
+  .alert-icon { font-size: 18px; flex-shrink: 0; }
+  .alert.info { background: var(--blue-light); border: 1px solid var(--blue-mid); color: var(--blue-dark); }
+  .alert.success { background: var(--green-light); border: 1px solid #A7F3D0; color: var(--green); }
+  .alert.danger { background: var(--red-light); border: 1px solid #FECACA; color: var(--red); }
+  .alert.warn { background: var(--accent-light); border: 1px solid #FDE68A; color: #92400E; }
+
+  /* ── COLUMNS ── */
+  .cols {
+    display: grid;
+    gap: 20px;
+  }
+  .cols-2 { grid-template-columns: 1fr 1fr; }
+  .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  /* ── EXAMPLE CARD ── */
+  .eg-card {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .eg-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 6px;
+  }
+  .eg-text {
+    font-size: clamp(12px, 1.3vw, 14px);
+    color: var(--gray-800);
+    font-weight: 500;
+  }
+
+  /* ── TABLE ── */
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: clamp(12px, 1.3vw, 14px);
+  }
+  .info-table th {
+    background: var(--blue);
+    color: #fff;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .info-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--gray-200);
+    color: var(--gray-800);
+    vertical-align: top;
+  }
+  .info-table tr:nth-child(even) td { background: var(--gray-50); }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 12px;
+  }
+  .badge-ok { background: #D1FAE5; color: #065F46; }
+  .badge-err { background: #FEE2E2; color: #991B1B; }
+
+  /* ── SLIDE NUMBER FOOTER ── */
+  .slide-footer {
+    position: absolute;
+    bottom: 14px;
+    right: 20px;
+    font-size: 11px;
+    color: var(--gray-400);
+    font-variant-numeric: tabular-nums;
+  }
+  .slide-brand {
+    position: absolute;
+    bottom: 14px;
+    left: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-400);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* ── CONTROLS ── */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .ctrl-btn {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+    user-select: none;
+  }
+  .ctrl-btn:hover { background: rgba(255,255,255,0.14); }
+  .ctrl-btn:disabled { opacity: 0.28; cursor: default; }
+
+  .progress-bar-wrap {
+    flex: 1;
+    max-width: 340px;
+    height: 4px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: #3B82F6;
+    border-radius: 2px;
+    transition: width 0.25s ease;
+  }
+
+  /* ── THUMBNAIL STRIP ── */
+  .thumb-strip {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 0 12px;
+    max-width: min(960px, 100%);
+    width: 100%;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.2) transparent;
+  }
+  .thumb {
+    flex-shrink: 0;
+    width: 110px;
+    height: 62px;
+    border-radius: 5px;
+    border: 2px solid transparent;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.15s;
+    background: #0F172A;
+  }
+  .thumb.active { border-color: #3B82F6; }
+  .thumb-label {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.65);
+    color: rgba(255,255,255,0.8);
+    font-size: 9px;
+    padding: 2px 4px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .thumb-num {
+    position: absolute;
+    top: 3px; left: 5px;
+    font-size: 9px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* ── HIGHLIGHT ── */
+  .hl { color: var(--blue); font-weight: 600; }
+  .mono-inline {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: #F1F5F9;
+    border: 1px solid #E2E8F0;
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: #0F172A;
+  }
+
+  /* ── RULES GRID ── */
+  .rule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .rule-item {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-top: 3px solid var(--blue);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .rule-item.ok { border-top-color: #10B981; }
+  .rule-item.bad { border-top-color: #EF4444; }
+  .rule-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gray-400);
+    margin-bottom: 4px;
+  }
+  .rule-text {
+    font-size: clamp(12px, 1.2vw, 13px);
+    color: var(--gray-900);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div style="display:flex;align-items:center">
+    <span class="topbar-title">Java Fundamentals</span>
+    <span class="topbar-sub">Lecture Series</span>
+  </div>
+  <span class="slide-counter" id="counter">1 / 18</span>
+</div>
+
+<div class="stage">
+  <!-- SLIDE WRAPPER -->
+  <div class="slide-wrapper">
+
+    <!-- ─── SLIDE 1: COVER ─── -->
+    <div class="slide slide-cover active" data-label="Cover">
+      <div class="cover-eyebrow">Unit 1 · Foundations</div>
+      <div class="cover-title">Java Programming<br>Fundamentals</div>
+      <div class="cover-sub">Platform · JDK · Syntax · Main Method</div>
+      <div class="cover-chips">
+        <span class="chip">JDK &amp; JRE</span>
+        <span class="chip">Class Syntax</span>
+        <span class="chip">main() Method</span>
+        <span class="chip">Method Anatomy</span>
+        <span class="chip">Best Practices</span>
+      </div>
+      <div class="slide-footer" style="color:rgba(255,255,255,0.25)">Slide 1</div>
+    </div>
+
+    <!-- ─── SLIDE 2: What is a Platform? ─── -->
+    <div class="slide slide-content" data-label="Platform">
+      <div class="slide-header">
+        <span class="slide-tag">Requirements</span>
+        <div class="slide-title">Primary Requirement: Platform</div>
+      </div>
+      <div class="def-card">
+        <div class="def-q">What is a Platform?</div>
+        <div class="def-a">A <strong>platform</strong> is a base or environment where something can operate, run, or be built upon. It comprises an <strong>Operating System</strong> (Hardware Manager) and its associated hardware.</div>
+      </div>
+      <div class="cols cols-2" style="gap:12px">
+        <div>
+          <div class="eg-label" style="margin-bottom:10px">Examples of Platforms</div>
+          <ul class="blist">
+            <li><strong>Windows</strong> – Microsoft's OS family</li>
+            <li><strong>macOS</strong> – Apple's desktop OS</li>
+            <li><strong>Linux</strong> – Open-source UNIX-like OS</li>
+            <li><strong>Android</strong> – Google's mobile OS</li>
+          </ul>
+        </div>
+        <div>
+          <div class="eg-label" style="margin-bottom:10px">What a Platform Includes</div>
+          <ul class="blist green">
+            <li>Operating System (hardware manager)</li>
+            <li>CPU architecture (x86, ARM…)</li>
+            <li>Memory &amp; storage management</li>
+            <li>Device drivers &amp; I/O interfaces</li>
+          </ul>
+        </div>
+      </div>
+      <div class="slide-brand">Java Fundamentals</div>
+      <div class="slide-footer">Slide 2</div>
+    </div>
+
+    <!-- ─── SLIDE 3: Secondary Req + Editor ─── -->
+    <div class="slide slide-content" data-label="Editor">
+      <div class="slide-header">
+        <span class="slide-tag">Requirements</span>
+        <div class="slide-title">Secondary Requirement: An Editor</div>
+      </div>
+      <div class="def-card">
+        <div class="def-q">What is an Editor?</div>
+        <div class="def-a">An <strong>editor</strong> is a software tool used to write and edit source code. It can be as simple as Notepad or as powerful as a full IDE.</div>
+      </div>
+      <div class="cols cols-3" style="margin-top:4px">
+        <div class="eg-card">
+          <div class="eg-label">Basic</div>
+          <div class="eg-text">Notepad / Gedit / TextEdit</div>
+        </div>
+        <div class="eg-card">
+          <div class="eg-label">Advanced Editor</div>
+          <div class="eg-text">VS Code / Sublime Text</div>
+        </div>
+        <div class="eg-card">
+          <div class="eg-label">Full IDE</div>
+          <div class="eg-text">IntelliJ IDEA / Eclipse</div>
+        </div>
+      </div>
+      <div class="alert info" style="margin-top:18px">
+        <span class="alert-icon">💡</span>
+        <span>Any text editor is sufficient to write Java code. A full IDE only adds debugging and autocomplete convenience — the language itself does not require it.</span>
+      </div>
+      <div class="slide-brand">Java Fundamentals</div>
+      <div class="slide-footer">Slide 3</div>
+    </div>
+
+    <!-- ─── SLIDE 4: JDK vs JRE ─── -->
+    <div class="slide slide-content" data-label="JDK & JRE">
+      <div class="slide-header">
+        <span class="slide-tag">Java Toolkit</span>
+        <div class="slide-title">JDK vs JRE</div>
+      </div>
+      <div class="cols cols-2">
+        <div>
+          <div class="def-card" style="margin-bottom:12px">
+            <div class="def-q">JDK – Java Development Kit</div>
+            <div class="def-a">Required to <strong>develop &amp; run</strong> Java programs. Contains the compiler (<span class="mono-inline">javac</span>), debugger, and the JRE.</div>
+          </div>
+          <ul class="blist" style="font-size:14px">
+            <li>Includes <span class="mono-inline">javac</span> (compiler)</li>
+            <li>Includes the Java debugger</li>
+            <li>Includes the complete JRE</li>
+          </ul>
+        </div>
+        <div>
+          <div class="def-card" style="border-left-color:#10B981;background:#ECFDF5;border-color:#A7F3D0">
+            <div class="def-q" style="color:#065F46">JRE – Java Runtime Environment</div>
+            <div class="def-a">Required only to <strong>run</strong> already-compiled Java programs. Does not include the compiler.</div>
+          </div>
+          <ul class="blist green" style="font-size:14px;margin-top:12px">
+            <li>Includes the JVM (Java Virtual Machine)</li>
+            <li>Includes core Java class libraries</li>
+            <li>No compilation tools</li>
+          </ul>
+        </div>
+      </div>
+      <div class="alert warn" style="margin-top:14px">
+        <span class="alert-icon">⚠️</span>
+        <span><strong>Rule of thumb:</strong> Developers install JDK. End users who only run apps can install JRE.</span>
+      </div>
+      <div class="slide-brand">Java Fundamentals</div>
+      <div class="slide-footer">Slide 4</div>
+    </div>
+
+    <!-- ─── SLIDE 5: CLASS SYNTAX ─── -->
+    <div class="slide slide-content" data-label="Class Syntax">
+      <div class="slide-header">
+        <span class="slide-tag">Java Syntax</span>
+        <div class="slide-title">Syntax for a Java Class</div>
+      </div>
+      <div class="body-lg" style="margin-bottom:14px">Every Java program starts with at least one class definition:</div>
+      <div class="code-wrap">
+        <div class="code-bar">
+          <span class="code-dot r"></span><span class="code-dot y"></span><span class="code-dot g"></span>
+          <span class="code-lang">Java</span>
+        </div>
+        <pre><span class="kw">class</span> <span class="ty">ClassName</span> {
+    <span class="cm">// fields, methods, constructors go here</span>
+}</pre>
+      </div>
+      <ul class="blist" style="margin-top:6px">
+        <li>The keyword <span class="mono-inline">class</span> declares a new class.</li>
+        <li><span class="mono-inline">ClassName</span> follows <strong>PascalCase</strong> convention (e.g., <span class="mono-inline">HelloWorld</span>).</li>
+        <li>Curly braces <span class="mono-inline">{ }</span> wrap the entire class body.</li>
+        <li>The file name <strong>must match</strong> the public class name exactly.</li>
+      </ul>
+      <div class="slide-brand">Java Fundamentals</div>
+      <div class="slide-footer">Slide 5</div>
+    </div>
+
+    <!-- ─── SLIDE 6: SECTION DIVIDER ─── -->
+    <div class="slide slide-section" data-label="§ main()">
+      <div class="section-num">02</div>
+      <div class="section-label">The <code style="font-family:var(--mono);color:var(--blue-dark)">main()</code> Method</div>
+      <div class="section-sub">Entry point · Rules · What happens without it</div>
+      <div class="slide-brand" style="color:var(--blue)">Java Fundamentals</div>
+      <div class="slide-footer" style="color:var(--gray-400)">Slide 6</div>
+    </div>
+
+    <!-- ─── SLIDE 7: Why main? ─── -->
+    <div class="slide slide-content" data-label="Why main?">
+      <div class="slide-header">
+        <span class="slide-tag">Execution</span>
+        <div class="slide-title">Why Is <code style="font-family:var(--mono);font-size:inherit">main()</code> Required?</div>
+      </div>
+      <div class="cols cols-2" style="align-items:start">
+        <div>
+          <div class="body-lg" style="margin-bottom:14px">The <span class="mono-inline">main()</span> method tells the JVM <strong>where to start</strong>. Without it, the program has no entry point to run.</div>
+          <ul class="blist">
+            <li>Execution <strong>begins</strong> at the first line of <span class="mono-inline">main()</span></li>
+            <li>Execution <strong>ends</strong> at the closing brace of <span class="mono-inline">main()</span></li>
+            <li>Without it: compiles fine, <em>cannot run</em></li>
+          </ul>
+        </div>
+        <div>
+          <div class="code-wrap">
+            <div class="code-bar">
+              <span class="code-dot r"></span><span class="code-dot y"></span><span class="code-dot g"></span>
+              <span class="code-lang">Java</span>
+            </div>
+            <pre><span class="kw">public class</span> <span class="ty">Hello</span> {
+  <span class="cm">// No main method here!</span>
+  <span class="kw">public void</span> <span class="fn">greet</span>() {
+    System.out.<span class="fn">println</span>(<span class="st">"Hello"</span>);
+  }
+}</pre>
+          </div>
+          <div class="alert danger" style="margin-top:8px;font-size:12px">
+            <span class="alert-icon">❌</span>
+            <span>Compiles OK. Running gives:<br><em>Error: Main method not found in class Hello</em></span>
+          </div>
+        </div>
+      </div>
+      <div class="slide-brand">Java Fundamentals</div>
+      <div class="slide-footer">Slide 7</div>
+    </div>
+
+    <!-- ─── SLIDE 8: main() full syntax ─── -->
+    <div class="slide slide-content" data-label="main() Anatomy">
+      <div class="slide-header">
+        <span class="slide-tag">Syntax</span>
+        <div class="slide-title">Anatomy of the <code style="font-family:var(--mono);font-size:inherit">main()</code> Method</div>
+      </div>
+      <div class="code-wrap" style="margin-bottom:16px">
+        <div class="code-bar">
+          <span class="code-dot r"></span><span class="code-dot y"></span><span class="code-dot g"></span>
+          <span class="code-lang">Java</span>
+        </div>
+        <pre><span class="kw">public</span>  <span class="kw">static</span>  <span class="kw">void</span>  <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+  <span class="cm">// program code here</span>
+}</pre>
+      </div>
+      <div class="rule-grid">
+        <div class="rule-item ok">
+          <div class="rule-num">01</div>
+          <div class="rule-text"><span class="mono-inline">public</span><br>Visible to JVM from outside the class</div>
+        </div>
+        <div class="rule-item ok">
+          <div class="rule-num">02</div>
+          <div class="rule-text"><span class="mono-inline">static</span><br>Called without creating an object</div>
+        </div>
+        <div class="rule-item ok">
+          <div class="rule-num">03</div>
+          <div class="rule-text"><span class="mono-inline">void</span><br>Returns nothing to the JVM</div>
+        </div>
+        <div class="rule-item ok">
+          <div class="rule-num">04</div>
+          <div class="rule-text"><span class="mono-inline">main</span><br>Reserved entry-point name (lowercase)</div>
+        </div>
+        <div class="rule-item ok">
+          <div class="rule-num">05</div>
+          <div class="rule-text"><span class="mono-inline">String[] args</span><br>Command-line arguments array</div>
+        </div>
+      </div>
+      <div class="slide-brand">Java Fundamentals</div>
+      <div class="slide-footer">Slide 8</div>
+    </div>
+
+    <!-- ─── SLIDE 9: Missing parts ─── -->
+    <div class="slide slide-content" data-label="Missing Parts">
+      <div class="slide-header">
+        <span class="slide-tag">Error Analysis</span>
+        <div class="slide-title">What Happens When Parts Are Missing?</div>
+      </div>
+      <table class="info-table">
+        <thead>
+          <tr>
+            <th>Missing Part</th>
+            <th>Compiles?</th>
+            <th>Runs?</th>
+            <th>Error</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="mono-inline">public</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-err">No</span></td>
+            <td>Main method not found</td>
+          </tr>
+          <tr>
+            <td><span class="mono-inline">static</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-err">No</span></td>
+            <td>Main method is not static</td>
+          </tr>
+          <tr>
+            <td><span class="mono-inline">void</span> (using <span class="mono-inline">int</span>)</td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-err">No</span></td>
+            <td>Main method not found</td>
+          </tr>
+          <tr>
+            <td><span class="mono-inline">main</span> (renamed)</td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-err">No</span></td>
+            <td>Main method not found</td>
+          </tr>
+          <tr>
+            <td>Parameter name</td>
+            <td><span class="badge badge-err">No</span></td>
+            <td><span class="badge badge-err">No</span></td>
+            <td>Compile-time: '(' expected</td>
+          </tr>
+          <tr>
+            <td><span class="mono-inline">String[]</span> (empty args)</td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-err">No</span></td>
+            <td>Main method not found</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="slide-brand">Java Fundamentals</div>
+      <div class="slide-footer">Slide 9</div>
+    </div>
+
+    <!-- ─── SLIDE 10: Args name flexibility ─── -->
+    <div class="slide slide-content" data-label="args name">
+      <div class="slide-header">
+        <span class="slide-tag">Flexibility</span>
+        <div class="slide-title">Can You Rename <code style="font-family:var(--mono);font-size:inherit">args</code>?</div>
+      </div>
+      <div class="body-lg" style="margin-bottom:16px">Yes! The JVM only cares about the <strong>type</strong> <span class="mono-inline">String[]</span> — not the parameter name. <span class="mono-inline">args</span> is just a convention.</div>
+      <div class="code-wrap">
+        <div class="code-bar">
+          <span class="code-dot r"></span><span class="code-dot y"></span><span class="code-dot g"></span>
+          <span class="code-lang">Java — all three are valid</span>
+        </div>
+        <pre><span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args)   { } <span class="cm">// conventional</span>
+<span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] myArgs) { } <span class="cm">// custom name</span>
+<span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] input)  { } <span class="cm">// also valid</span></pre>
+      </div>
+      <div class="alert success" style="margin-top:16px">
+        <span class="alert-icon">✅</span>
+        <span>The parameter <strong>name</strong> can be anything. The parameter <strong>type</strong> (<span class="mono-inline">String[]</span>) is mandatory and cannot change.</span>
+      </div>
+      <div class="slide-brand">Java Fundamentals</div>
+      <div class="slide-footer">Slide 10</div>
+    </div>
+
+    <!-- ─── SLIDE 11: Overloading main ─── -->
+    <div class="slide slide-content" data-label="Overloading main">
+      <div class="slide-header">
+        <span class="slide-tag">Overloading</span>
+        <div class="slide-title">Overloading the <code style="font-family:var(--mono);font-size:inherit">main()</code> Method</div>
+      </div>
+      <div class="code-wrap" style="margin-bottom:14px">
+        <div class="code-bar">
+          <span class="code-dot r"></span><span class="code-dot y"></span><span class="code-dot g"></span>
+          <span class="code-lang">Java</span>
+        </div>
+        <pre><span class="kw">public class</span> <span class="ty">Example</span> {
+  <span class="kw">public static void</span> <span class="fn">main</span>(<span class="kw">int</span>[] args) {  <span class="cm">// overloaded version</span>
+    System.out.<span class="fn">println</span>(<span class="st">"This is an overloaded main."</span>);
+  }
+  <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) { <span class="cm">// JVM entry point</span>
+    <span class="ty">Example</span> obj = <span class="kw">new</span> <span class="ty">Example</span>();
+  }
+}</pre>
+      </div>
+      <div class="cols cols-2" style="gap:12px">
+        <div class="alert success">
+          <span class="alert-icon">✅</span>
+          <span>JVM always calls <span class="mono-inline">main(String[])</span> as the entry point. Other overloads are ignored unless explicitly called.</span>
+        </div>
+        <div class="alert warn">
+          <span class="alert-icon">⚠️</span>
+          <span>Overloading <span class="mono-inline">main()</span> is technically allowed but is considered <strong>bad practice</strong>. Avoid it in production code.</span>
+        </div>
+      </div>
+      <div class="slide-brand">Java Fundamentals</div>
+      <div class="slide-footer">Slide 11</div>
+    </div>
+
+    <!-- ─── SLIDE 12: SECTION: Method Syntax ─── -->
+    <div class="slide slide-section" data-label="§ Methods">
+      <div class="section-num">03</div>
+      <div class="section-label">Method Syntax</div>
+      <div class="section-sub">Access modifiers · Return types · Parameters</div>
+      <div class="slide-brand" style="color:var(--blue)">Java Fundamentals</div>
+      <div class="slide-footer" style="color:var(--gray-400)">Slide 12</div>
+    </div>
+
+    <!-- ─── SLIDE 13: Method Syntax ─── -->
+    <div class="slide slide-content" data-label="Method Syntax">
+      <div class="slide-header">
+        <span class="slide-tag">Syntax</span>
+        <div class="slide-title">General Method Syntax</div>
+      </div>
+      <div class="code-wrap" style="margin-bottom:16px">
+        <div class="code-bar">
+          <span class="code-dot r"></span><span class="code-dot y"></span><span class="code-dot g"></span>
+          <span class="code-lang">Java – method template</span>
+        </div>
+        <pre>[<span class="kw">accessModifier</span>] [<span class="kw">nonAccessModifier</span>] <span class="ty">returnType</span> <span class="fn">methodName</span>([<span class="ty">ParameterList</span>]) {
+    <span class="cm">// method body</span>
+}</pre>
+      </div>
+      <div class="rule-grid">
+        <div class="rule-item">
+          <div class="rule-num">Access Modifier</div>
+          <div class="rule-text"><span class="mono-inline">public</span> <span class="mono-inline">private</span> <span class="mono-inline">protected</span></div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">Non-Access Modifier</div>
+          <div class="rule-text"><span class="mono-inline">static</span> <span class="mono-inline">final</span> <span class="mono-inline">abstract</span></div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">Return Type</div>
+          <div class="rule-text"><span class="mono-inline">void</span> <span class="mono-inline">int</span> <span class="mono-inline">String</span> etc.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">Parameter List</div>
+          <div class="rule-text">Comma-separated type-name pairs (can be empty)</div>
+        </div>
+      </div>
+      <div class="slide-brand">Java Fundamentals</div>
+      <div class="slide-footer">Slide 13</div>
+    </div>
+
+    <!-- ─── SLIDE 14: Rules for main ─── -->
+    <div class="slide slide-content" data-label="main() Rules">
+      <div class="slide-header">
+        <span class="slide-tag">Rules</span>
+        <div class="slide-title">5 Rules for the <code style="font-family:var(--mono);font-size:inherit">main()</code> Method</div>
+      </div>
+      <div class="rule-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
+        <div class="rule-item ok">
+          <div class="rule-num">Rule 1</div>
+          <div class="rule-text">Must be <span class="mono-inline">public</span></div>
+        </div>
+        <div class="rule-item ok">
+          <div class="rule-num">Rule 2</div>
+          <div class="rule-text">Must be <span class="mono-inline">static</span></div>
+        </div>
+        <div class="rule-item ok">
+          <div class="rule-num">Rule 3</div>
+          <div class="rule-text">Return type must be <span class="mono-inline">void</span></div>
+        </div>
+        <div class="rule-item ok">
+          <div class="rule-num">Rule 4</div>
+          <div class="rule-text">Name must be lowercase <span class="mono-inline">main</span></div>
+        </div>
+        <div class="rule-item ok">
+          <div class="rule-num">Rule 5</div>
+          <div class="rule-text">Parameter must be <span class="mono-inline">String[]</span></div>
+        </div>
+      </div>
+      <div class="alert info" style="margin-top:16px">
+        <span class="alert-icon">📌</span>
+        <span>Any method can technically be <em>named</em> <span class="mono-inline">main</span>, but only the signature <span class="mono-inline">public static void main(String[])</span> is recognised by the JVM as the entry point.</span>
+      </div>
+      <div class="slide-brand">Java Fundamentals</div>
+      <div class="slide-footer">Slide 14</div>
+    </div>
+
+    <!-- ─── SLIDE 15: SECTION: Miscellaneous ─── -->
+    <div class="slide slide-section" data-label="§ Misc">
+      <div class="section-num">04</div>
+      <div class="section-label">Miscellaneous Java Facts</div>
+      <div class="section-sub">Package rules · Default types</div>
+      <div class="slide-brand" style="color:var(--blue)">Java Fundamentals</div>
+      <div class="slide-footer" style="color:var(--gray-400)">Slide 15</div>
+    </div>
+
+    <!-- ─── SLIDE 16: Misc ─── -->
+    <div class="slide slide-content" data-label="Misc Facts">
+      <div class="slide-header">
+        <span class="slide-tag">Java Trivia</span>
+        <div class="slide-title">Important Miscellaneous Rules</div>
+      </div>
+      <ul class="blist" style="gap:18px">
+        <li>
+          <div>
+            <strong>Package statement comes first.</strong><br>
+            <span class="body-md">The <span class="mono-inline">package</span> statement, if present, must be the very first line in a Java source file — before any imports or class declarations.</span>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>Whole numbers default to <span class="mono-inline">int</span>.</strong><br>
+            <span class="body-md">When you write <span class="mono-inline">42</span> in Java, the compiler treats it as an <span class="mono-inline">int</span> by default. Use <span class="mono-inline">42L</span> for <span class="mono-inline">long</span>.</span>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>Fractional numbers default to <span class="mono-inline">double</span>.</strong><br>
+            <span class="body-md">Writing <span class="mono-inline">3.14</span> gives you a <span class="mono-inline">double</span>. Use <span class="mono-inline">3.14f</span> for a <span class="mono-inline">float</span> literal.</span>
+          </div>
+        </li>
+      </ul>
+      <div class="code-wrap" style="margin-top:16px">
+        <div class="code-bar"><span class="code-dot r"></span><span class="code-dot y"></span><span class="code-dot g"></span><span class="code-lang">Java</span></div>
+        <pre><span class="ty">int</span>    a = 42;       <span class="cm">// default: int</span>
+<span class="ty">long</span>   b = 42L;      <span class="cm">// explicit long</span>
+<span class="ty">double</span> c = 3.14;     <span class="cm">// default: double</span>
+<span class="ty">float</span>  d = 3.14f;    <span class="cm">// explicit float</span></pre>
+      </div>
+      <div class="slide-brand">Java Fundamentals</div>
+      <div class="slide-footer">Slide 16</div>
+    </div>
+
+    <!-- ─── SLIDE 17: Quick Summary ─── -->
+    <div class="slide slide-content" data-label="Summary">
+      <div class="slide-header">
+        <span class="slide-tag">Recap</span>
+        <div class="slide-title">Quick Summary</div>
+      </div>
+      <div class="cols cols-2" style="gap:14px">
+        <div>
+          <div class="eg-label" style="margin-bottom:8px">Key Definitions</div>
+          <ul class="blist" style="font-size:13px;gap:10px">
+            <li><strong>Platform</strong> = OS + Hardware</li>
+            <li><strong>Editor</strong> = tool to write/edit code</li>
+            <li><strong>JDK</strong> = develop + run Java</li>
+            <li><strong>JRE</strong> = run Java only</li>
+            <li><strong>JVM</strong> = executes Java bytecode</li>
+          </ul>
+        </div>
+        <div>
+          <div class="eg-label" style="margin-bottom:8px">main() Checklist</div>
+          <ul class="blist green" style="font-size:13px;gap:10px">
+            <li><span class="mono-inline">public</span> — accessible to JVM</li>
+            <li><span class="mono-inline">static</span> — no object needed</li>
+            <li><span class="mono-inline">void</span> — returns nothing</li>
+            <li><span class="mono-inline">main</span> — exact keyword</li>
+            <li><span class="mono-inline">String[] args</span> — required param</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cols cols-2" style="margin-top:14px;gap:14px">
+        <div class="alert warn">
+          <span class="alert-icon">💡</span>
+          <span>Whole number literals → <span class="mono-inline">int</span>. Fractional literals → <span class="mono-inline">double</span>.</span>
+        </div>
+        <div class="alert info">
+          <span class="alert-icon">📦</span>
+          <span><span class="mono-inline">package</span> statement must be the very first line in any Java file.</span>
+        </div>
+      </div>
+      <div class="slide-brand">Java Fundamentals</div>
+      <div class="slide-footer">Slide 17</div>
+    </div>
+
+    <!-- ─── SLIDE 18: END ─── -->
+    <div class="slide slide-cover" style="background:linear-gradient(135deg,#064E3B,#065F46,#0F766E)" data-label="End">
+      <div class="cover-eyebrow" style="color:#6EE7B7">Unit 1 Complete</div>
+      <div class="cover-title">That's a Wrap!</div>
+      <div class="cover-sub">Any questions on Platforms, JDK, or the main() method?</div>
+      <div class="cover-chips">
+        <span class="chip">Next: Variables &amp; Data Types</span>
+        <span class="chip">Next: Control Flow</span>
+      </div>
+      <div class="slide-footer" style="color:rgba(255,255,255,0.25)">Slide 18</div>
+    </div>
+
+  </div><!-- /slide-wrapper -->
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <button class="ctrl-btn" id="prevBtn" onclick="changeSlide(-1)" title="Previous">&#8592;</button>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+    <button class="ctrl-btn" id="nextBtn" onclick="changeSlide(1)" title="Next">&#8594;</button>
+  </div>
+
+  <!-- THUMBNAIL STRIP -->
+  <div class="thumb-strip" id="thumbStrip"></div>
+</div><!-- /stage -->
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  function updateUI() {
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    document.getElementById('counter').textContent = `${current + 1} / ${total}`;
+    document.getElementById('prevBtn').disabled = current === 0;
+    document.getElementById('nextBtn').disabled = current === total - 1;
+    document.getElementById('progressFill').style.width = `${((current + 1) / total) * 100}%`;
+    document.querySelectorAll('.thumb').forEach((t, i) => t.classList.toggle('active', i === current));
+    const strip = document.getElementById('thumbStrip');
+    const active = strip.children[current];
+    if (active) active.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+  }
+
+  function changeSlide(dir) {
+    const next = current + dir;
+    if (next >= 0 && next < total) { current = next; updateUI(); }
+  }
+
+  // Build thumbnail strip
+  const strip = document.getElementById('thumbStrip');
+  slides.forEach((s, i) => {
+    const t = document.createElement('div');
+    t.className = 'thumb';
+    t.innerHTML = `<span class="thumb-num">${i + 1}</span><span class="thumb-label">${s.dataset.label || 'Slide ' + (i + 1)}</span>`;
+    const bg = s.classList.contains('slide-cover') ? (i === total - 1 ? '#064E3B' : '#0F172A') : (s.classList.contains('slide-section') ? '#EFF6FF' : '#fff');
+    t.style.background = bg;
+    t.onclick = () => { current = i; updateUI(); };
+    strip.appendChild(t);
+  });
+
+  // Keyboard nav
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   changeSlide(-1);
+  });
+
+  updateUI();
+</script>
+</body>
+</html>
